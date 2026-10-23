@@ -1,0 +1,19 @@
+# Python virtual environment & bytecode
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database files (auto-created on first run)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite3
+
+# Environment variables & IDE files
+.env
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

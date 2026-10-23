@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SurplusLink — Community Surplus Food Rescue Network</title>
+
+  <!-- Google Fonts: Fraunces (Display Heading) + Plus Jakarta Sans (Clean Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Leaflet CSS for OpenStreetMap -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Skip Link for Keyboard Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Top Navigation Bar -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="#home" class="brand" data-nav="home" aria-label="SurplusLink Home">
+        <span class="brand-mark" aria-hidden="true">🌱</span>
+        <span class="brand-text">Surplus<span class="brand-accent">Link</span></span>
+      </a>
+
+      <button
+        type="button"
+        id="mobile-menu-btn"
+        class="mobile-menu-btn"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+      >
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav id="main-nav" class="main-nav" aria-label="Primary Navigation">
+        <button type="button" class="nav-link active" data-nav="home">Home</button>
+        <button type="button" class="nav-link" data-nav="board">
+          Live Board
+          <span id="nav-live-badge" class="nav-badge">0</span>
+        </button>
+        <button type="button" id="nav-my-btn" class="nav-link hidden" data-nav="my">
+          My Activity
+        </button>
+        <button type="button" id="nav-admin-btn" class="nav-link hidden" data-nav="admin">
+          Admin Panel
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" id="post-surplus-btn" class="btn btn-mango hidden">
+          + Post Surplus Food
+        </button>
+        <div id="user-pill" class="user-pill hidden">
+          <span id="user-pill-name" class="user-pill-name"></span>
+          <span id="user-pill-role" class="role-badge"></span>
+          <button type="button" id="logout-btn" class="btn-link-logout" title="Log out">
+            Log out
+          </button>
+        </div>
+        <button type="button" id="open-auth-btn" class="btn btn-primary">
+          Sign In / Join
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- =====================================================================
+         VIEW 1: HOME
+         ===================================================================== -->
+    <section id="view-home" class="view-section active" aria-labelledby="hero-heading">
+      <div class="hero-section">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow-pill">
+              <span class="pulse-dot"></span> Real-Time Hyperlocal Food Rescue
+            </div>
+            <h1 id="hero-heading">
+              Turn today’s surplus meals into <span class="highlight-mango">tonight’s shared table.</span>
+            </h1>
+            <p class="hero-lead">
+              SurplusLink connects restaurants, campus dining halls, hostels, and event caterers
+              with verified NGOs and volunteer food rescuers before fresh food goes to waste.
+            </p>
+            <div class="hero-cta-group">
+              <button type="button" class="btn btn-mango btn-lg" data-nav="board">
+                Explore Live Food Board
+              </button>
+              <button type="button" id="hero-donate-btn" class="btn btn-outline-light btn-lg">
+                Share Surplus Food
+              </button>
+            </div>
+            <p class="hero-subnote">
+              100% free &bull; Race-safe instant claiming &bull; Strict 48-hour freshness window
+            </p>
+          </div>
+
+          <div class="hero-card-preview" aria-hidden="true">
+            <div class="preview-card">
+              <div class="preview-header">
+                <span class="food-tag tag-cooked">Cooked Meals</span>
+                <span class="preview-servings">35 Servings</span>
+              </div>
+              <h3>Hot Vegetable Pulao &amp; Dal Trays</h3>
+              <p>Student Union Dining Hall, Gate 2 &bull; 1.2 km away</p>
+              <div class="freshness-wrap">
+                <div class="freshness-labels">
+                  <span>Freshness countdown</span>
+                  <span class="freshness-time-text">3h 25m left</span>
+                </div>
+                <div class="freshness-track">
+                  <div class="freshness-fill fill-green" style="width: 78%"></div>
+                </div>
+              </div>
+              <div class="preview-footer">
+                <span class="status-pill status-available">Available Now</span>
+                <span class="preview-cta">Instant Claim &rarr;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Impact Stats Strip -->
+      <div class="stats-strip" aria-label="Live Platform Impact Statistics">
+        <div class="container stats-grid">
+          <div class="stat-card">
+            <span class="stat-value" id="stat-meals">0</span>
+            <span class="stat-label">Meals Shared</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-pickups">0</span>
+            <span class="stat-label">Pickups Completed</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-listed">0</span>
+            <span class="stat-label">Active Listings Now</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-donors">0</span>
+            <span class="stat-label">Food Donors</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-receivers">0</span>
+            <span class="stat-label">NGOs &amp; Volunteers</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- How It Works (3 Steps) -->
+      <div class="section-block container">
+        <div class="section-header">
+          <span class="section-tag">How It Works</span>
+          <h2>Three simple steps from kitchen to community</h2>
+          <p>Designed for speed, food safety, and zero coordination friction.</p>
+        </div>
+
+        <div class="steps-grid">
+          <article class="step-card">
+            <div class="step-num">01</div>
+            <h3>Post Surplus in 60 Seconds</h3>
+            <p>
+              Donors log quantity, food category, a pickup deadline (up to 48 hours), and drop a
+              pin on the interactive map.
+            </p>
+          </article>
+          <article class="step-card">
+            <div class="step-num">02</div>
+            <h3>NGOs Browse &amp; Claim</h3>
+            <p>
+              Receivers sort listings by distance, watch live freshness bars, and claim a batch
+              with one race-safe click.
+            </p>
+          </article>
+          <article class="step-card">
+            <div class="step-num">03</div>
+            <h3>Direct Coordinate &amp; Pickup</h3>
+            <p>
+              Once claimed, phone numbers are privately unlocked between the donor and receiver to
+              complete the handoff and log the impact.
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="section-block faq-section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-tag">Frequently Asked Questions</span>
+            <h2>Everything you need to know</h2>
+          </div>
+
+          <div class="faq-list">
+            <details class="faq-item" open>
+              <summary>How does SurplusLink ensure food safety?</summary>
+              <p>
+                Every listing requires a strict pickup deadline in the future and at most 48 hours
+                away. Each card displays a real-time freshness bar that shifts from green to amber
+                to chili red as the deadline approaches, and unclaimed listings automatically expire
+                the moment time runs out.
+              </p>
+            </details>
+            <details class="faq-item">
+              <summary>Are phone numbers visible to everyone on the internet?</summary>
+              <p>
+                No. Phone numbers are strictly hidden on public listings. Contact numbers are
+                revealed only after a registered receiver claims a listing, and only to the
+                specific donor and receiver involved in that pickup (plus platform administrators).
+              </p>
+            </details>
+            <details class="faq-item">
+              <summary>What happens if two volunteers click "Claim" at the exact same moment?</summary>
+              <p>
+                Our backend uses an atomic database guard (`UPDATE ... WHERE status='available'`).
+                Only the first request succeeds, and the second user immediately receives a polite
+                notification that the listing was just claimed.
+              </p>
+            </details>
+            <details class="faq-item">
+              <summary>What if a volunteer claims a listing but cannot make it?</summary>
+              <p>
+                Receivers can click "Release Claim" from the Live Board or My Activity page at any
+                time before pickup, immediately returning the listing to "Available" so another NGO
+                can rescue it.
+              </p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         VIEW 2: LIVE BOARD
+         ===================================================================== -->
+    <section id="view-board" class="view-section" aria-labelledby="board-heading">
+      <div class="container board-wrapper">
+        <div class="board-header">
+          <div>
+            <h1 id="board-heading">Live Surplus Board</h1>
+            <p class="board-subtitle">
+              Auto-refreshes every 30 seconds &bull; Markers colored by pickup urgency
+            </p>
+          </div>
+          <div class="board-header-actions">
+            <button type="button" id="board-locate-btn" class="btn btn-outline">
+              📍 Sort by My Distance
+            </button>
+            <button type="button" id="board-refresh-btn" class="btn btn-ghost" title="Refresh now">
+              ↻ Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" role="search" aria-label="Filter food listings">
+          <div class="filter-group filter-search">
+            <label for="filter-q" class="sr-only">Search listings</label>
+            <input
+              type="search"
+              id="filter-q"
+              placeholder="Search food title, description, or address..."
+            />
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-food-type">Category</label>
+            <select id="filter-food-type">
+              <option value="">All Categories</option>
+              <option value="cooked">Cooked Meals</option>
+              <option value="bakery">Bakery &amp; Bread</option>
+              <option value="produce">Fresh Produce</option>
+              <option value="packaged">Packaged Food</option>
+              <option value="dairy">Dairy &amp; Chilled</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-status">Status</label>
+            <select id="filter-status">
+              <option value="">Available &amp; Claimed</option>
+              <option value="available">Available Only</option>
+              <option value="claimed">Claimed Only</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Split View: Cards List + Interactive Map -->
+        <div class="board-split">
+          <div class="board-list-column">
+            <div id="board-loading" class="state-box hidden">Loading live listings...</div>
+            <div id="board-empty" class="state-box hidden">
+              <h3>No matching surplus listings right now</h3>
+              <p>Try clearing your filters or check back soon. Donors can post new surplus anytime!</p>
+            </div>
+            <div id="board-cards" class="cards-stack" aria-live="polite"></div>
+          </div>
+
+          <div class="board-map-column">
+            <div class="map-legend">
+              <span><i class="legend-dot dot-green"></i> &gt; 4h left</span>
+              <span><i class="legend-dot dot-amber"></i> 1.5–4h left</span>
+              <span><i class="legend-dot dot-red"></i> &lt; 1.5h (Urgent)</span>
+              <span><i class="legend-dot dot-blue"></i> Claimed</span>
+            </div>
+            <div id="board-map" class="board-map" aria-label="Interactive map of surplus food"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         VIEW 3: MY ACTIVITY
+         ===================================================================== -->
+    <section id="view-my" class="view-section" aria-labelledby="my-heading">
+      <div class="container section-block">
+        <div class="board-header">
+          <div>
+            <h1 id="my-heading">My Activity</h1>
+            <p id="my-subtitle" class="board-subtitle">
+              Track your donations, claims, and direct pickup contacts.
+            </p>
+          </div>
+          <button type="button" id="my-post-btn" class="btn btn-mango hidden">
+            + Post New Listing
+          </button>
+        </div>
+
+        <div id="my-empty" class="state-box hidden">
+          <h3>No activity yet</h3>
+          <p id="my-empty-text">Your posted or claimed food listings will appear here.</p>
+        </div>
+
+        <div id="my-cards" class="my-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         VIEW 4: ADMIN DASHBOARD
+         ===================================================================== -->
+    <section id="view-admin" class="view-section" aria-labelledby="admin-heading">
+      <div class="container section-block">
+        <div class="board-header">
+          <div>
+            <h1 id="admin-heading">Platform Administration</h1>
+            <p class="board-subtitle">
+              Oversee registered donors, receivers, and all listings across SurplusLink.
+            </p>
+          </div>
+          <button type="button" id="admin-refresh-btn" class="btn btn-outline">
+            ↻ Refresh Data
+          </button>
+        </div>
+
+        <!-- Admin Users Table -->
+        <div class="admin-panel-card">
+          <div class="admin-card-header">
+            <h2>Registered Users (<span id="admin-users-count">0</span>)</h2>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Organization</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Activity</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Admin All Listings Table -->
+        <div class="admin-panel-card">
+          <div class="admin-card-header">
+            <h2>All Listings (<span id="admin-listings-count">0</span>)</h2>
+            <div class="admin-filter-inline">
+              <label for="admin-status-filter">Filter status:</label>
+              <select id="admin-status-filter">
+                <option value="all">All Statuses</option>
+                <option value="available">Available</option>
+                <option value="claimed">Claimed</option>
+                <option value="completed">Completed</option>
+                <option value="expired">Expired</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title &amp; Category</th>
+                  <th>Qty</th>
+                  <th>Donor</th>
+                  <th>Claimed By</th>
+                  <th>Pickup Deadline</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-listings-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <span class="brand-text">Surplus<span class="brand-accent">Link</span></span>
+        <p class="footer-note">
+          Built to bridge food surplus with community hunger relief. Zero waste, full plates.
+        </p>
+      </div>
+      <div class="footer-links">
+        <button type="button" class="footer-nav-btn" data-nav="home">Home</button>
+        <button type="button" class="footer-nav-btn" data-nav="board">Live Board</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       DIALOG 1: LOGIN / REGISTER MODAL
+       ========================================================================= -->
+  <div
+    id="auth-modal"
+    class="modal-backdrop hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="auth-modal-title"
+  >
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="auth-modal-title">Welcome to SurplusLink</h2>
+        <button type="button" class="modal-close" data-close-modal="auth-modal" aria-label="Close">
+          &times;
+        </button>
+      </div>
+
+      <div class="auth-tabs" role="tablist">
+        <button
+          type="button"
+          id="tab-login"
+          class="auth-tab active"
+          role="tab"
+          aria-selected="true"
+        >
+          Sign In
+        </button>
+        <button
+          type="button"
+          id="tab-register"
+          class="auth-tab"
+          role="tab"
+          aria-selected="false"
+        >
+          Create Account
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="modal-form" novalidate>
+        <div class="form-field">
+          <label for="login-email">Email Address</label>
+          <input
+            type="email"
+            id="login-email"
+            required
+            autocomplete="email"
+            placeholder="you@example.org"
+          />
+        </div>
+        <div class="form-field">
+          <label for="login-password">Password</label>
+          <input
+            type="password"
+            id="login-password"
+            required
+            autocomplete="current-password"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="modal-form hidden" novalidate>
+        <fieldset class="role-selector">
+          <legend>I want to join as a:</legend>
+          <div class="role-cards">
+            <label class="role-option">
+              <input type="radio" name="reg-role" value="donor" checked />
+              <span class="role-card-inner">
+                <strong>🍲 Food Donor</strong>
+                <small>Restaurant, caterer, hostel, or individual sharing surplus</small>
+              </span>
+            </label>
+            <label class="role-option">
+              <input type="radio" name="reg-role" value="receiver" />
+              <span class="role-card-inner">
+                <strong>🤝 NGO / Receiver</strong>
+                <small>Charity, shelter, or volunteer collecting surplus food</small>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="form-row-2">
+          <div class="form-field">
+            <label for="reg-name">Full Name *</label>
+            <input type="text" id="reg-name" required placeholder="Priya Nair" />
+          </div>
+          <div class="form-field">
+            <label for="reg-org">Organization / Kitchen</label>
+            <input type="text" id="reg-org" placeholder="Sunrise Kitchen / Hope NGO" />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-field">
+            <label for="reg-email">Email Address *</label>
+            <input type="email" id="reg-email" required placeholder="priya@example.org" />
+          </div>
+          <div class="form-field">
+            <label for="reg-phone">Phone Number *</label>
+            <input type="tel" id="reg-phone" required placeholder="+91 98765 43210" />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="reg-password">Password (min 10 characters) *</label>
+          <input type="password" id="reg-password" minlength="10" required placeholder="At least 10 characters" />
+        </div>
+
+        <button type="submit" class="btn btn-mango btn-block">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       DIALOG 2: POST / EDIT SURPLUS LISTING MODAL
+       ========================================================================= -->
+  <div
+    id="listing-modal"
+    class="modal-backdrop hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="listing-modal-title"
+  >
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <h2 id="listing-modal-title">Post Surplus Food</h2>
+        <button
+          type="button"
+          class="modal-close"
+          data-close-modal="listing-modal"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+      </div>
+
+      <form id="listing-form" class="modal-form" novalidate>
+        <input type="hidden" id="listing-id" value="" />
+
+        <div class="form-row-2">
+          <div class="form-field">
+            <label for="listing-title">Food Title *</label>
+            <input
+              type="text"
+              id="listing-title"
+              required
+              placeholder="e.g., 30 Servings of Veg Biryani & Raita"
+            />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-field">
+              <label for="listing-food-type">Category *</label>
+              <select id="listing-food-type" required>
+                <option value="cooked">Cooked Meals</option>
+                <option value="bakery">Bakery &amp; Bread</option>
+                <option value="produce">Fresh Produce</option>
+                <option value="packaged">Packaged Food</option>
+                <option value="dairy">Dairy &amp; Chilled</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="listing-quantity">Quantity (Servings) *</label>
+              <input
+                type="number"
+                id="listing-quantity"
+                min="1"
+                max="5000"
+                required
+                placeholder="25"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="listing-description">Storage &amp; Packaging Notes</label>
+          <textarea
+            id="listing-description"
+            rows="2"
+            maxlength="1000"
+            placeholder="Allergens, container instructions, whether volunteer should bring vessels..."
+          ></textarea>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-field">
+            <label for="listing-address">Pickup Address / Landmark *</label>
+            <input
+              type="text"
+              id="listing-address"
+              required
+              maxlength="200"
+              placeholder="Gate 3, Hostel Mess Block A, Anna Nagar"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="listing-pickup-by">Pickup Deadline (max 48h from now) *</label>
+            <input type="datetime-local" id="listing-pickup-by" required />
+          </div>
+        </div>
+
+        <!-- Mini Map for Pinning Pickup Spot -->
+        <div class="form-field">
+          <div class="mini-map-header">
+            <label>Tap the map to set exact pickup spot *</label>
+            <button type="button" id="use-my-location-btn" class="btn btn-sm btn-outline">
+              📍 Use My Location
+            </button>
+          </div>
+          <div id="picker-map" class="picker-map" aria-label="Tap to choose pickup coordinates"></div>
+          <div class="coords-readout">
+            <span>Latitude: <strong id="lat-display">13.0674</strong></span>
+            <span>Longitude: <strong id="lng-display">80.2376</strong></span>
+            <input type="hidden" id="listing-lat" value="13.0674" />
+            <input type="hidden" id="listing-lng" value="80.2376" />
+          </div>
+        </div>
+
+        <div class="modal-footer-btns">
+          <button type="button" class="btn btn-ghost" data-close-modal="listing-modal">
+            Cancel
+          </button>
+          <button type="submit" id="listing-submit-btn" class="btn btn-mango">
+            Publish Listing
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="assertive"></div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <!-- Main Application JS -->
+  <script src="js/app.js"></script>
+</body>
+</html>
